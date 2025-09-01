@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Simple training script for basic ML models
-Trains Logistic Regression and Random Forest models
+Simple training script for 3 ML models only
+Trains Logistic Regression, Random Forest, and SVM models
 """
 
 import pandas as pd
@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 import joblib
@@ -56,8 +57,8 @@ def create_synthetic_data(n_samples=500):
     return data
 
 def train_models():
-    """Train basic ML models"""
-    print("🩺 Training Basic ML Models for Diabetes Detection")
+    """Train 3 ML models only"""
+    print("🩺 Training 3 ML Models for Diabetes Detection")
     print("=" * 50)
     
     # Create data
@@ -87,7 +88,7 @@ def train_models():
     X_test_scaled = scaler.transform(X_test)
     
     # Train models
-    print("\n🤖 Training models...")
+    print("\n🤖 Training 3 models...")
     
     # Logistic Regression
     print("   Training Logistic Regression...")
@@ -103,6 +104,13 @@ def train_models():
     rf_score = rf_model.score(X_test_scaled, y_test)
     print(f"   ✅ Random Forest - Accuracy: {rf_score:.3f}")
     
+    # Support Vector Machine (SVM)
+    print("   Training Support Vector Machine...")
+    svm_model = SVC(random_state=42, probability=True)
+    svm_model.fit(X_train_scaled, y_train)
+    svm_score = svm_model.score(X_test_scaled, y_test)
+    print(f"   ✅ SVM - Accuracy: {svm_score:.3f}")
+    
     # Create models directory if it doesn't exist
     os.makedirs('models', exist_ok=True)
     
@@ -110,6 +118,7 @@ def train_models():
     print("\n💾 Saving models...")
     joblib.dump(lr_model, 'models/logistic_regression_model.pkl')
     joblib.dump(rf_model, 'models/random_forest_model.pkl')
+    joblib.dump(svm_model, 'models/svm_model.pkl')
     joblib.dump(scaler, 'models/scaler.pkl')
     joblib.dump(imputer, 'models/imputer.pkl')
     joblib.dump(features, 'models/feature_names.pkl')
@@ -122,7 +131,7 @@ def train_models():
         'y_test': y_test
     }, 'models/processed_data.pkl')
     
-    print("✅ All models saved successfully!")
+    print("✅ All 3 models saved successfully!")
     print(f"   Models saved in: {os.path.abspath('models')}")
     
     # Test predictions
@@ -134,10 +143,13 @@ def train_models():
     lr_prob = lr_model.predict_proba(sample_scaled)[0][1]
     rf_pred = rf_model.predict(sample_scaled)[0]
     rf_prob = rf_model.predict_proba(sample_scaled)[0][1]
+    svm_pred = svm_model.predict(sample_scaled)[0]
+    svm_prob = svm_model.predict_proba(sample_scaled)[0][1]
     
     print(f"   Sample patient prediction:")
     print(f"   Logistic Regression: {'Diabetic' if lr_pred else 'Non-diabetic'} (Risk: {lr_prob:.1%})")
     print(f"   Random Forest: {'Diabetic' if rf_pred else 'Non-diabetic'} (Risk: {rf_prob:.1%})")
+    print(f"   SVM: {'Diabetic' if svm_pred else 'Non-diabetic'} (Risk: {svm_prob:.1%})")
     
     print("\n🎉 Training complete! You can now run the web app.")
     print("   Run: streamlit run app.py")

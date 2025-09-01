@@ -4,7 +4,7 @@ This project implements a comprehensive machine learning solution for diabetes d
 
 ## Features
 
-- **Multiple ML Algorithms**: Random Forest, Support Vector Machine, Logistic Regression, XGBoost, and LightGBM
+- **Three Core ML Algorithms**: Logistic Regression, Random Forest, and Support Vector Machine (SVM)
 - **Data Preprocessing**: Feature scaling, handling missing values, and feature engineering
 - **Model Evaluation**: Comprehensive metrics including accuracy, precision, recall, F1-score, and ROC curves
 - **Web Interface**: Streamlit-based web application for easy interaction
@@ -77,12 +77,10 @@ The project uses a diabetes dataset with the following features:
 
 ## Model Performance
 
-The project compares multiple algorithms:
-- Random Forest
-- Support Vector Machine
+The project implements three core algorithms:
 - Logistic Regression
-- XGBoost
-- LightGBM
+- Random Forest
+- Support Vector Machine (SVM)
 
 Each model is evaluated using:
 - Accuracy Score

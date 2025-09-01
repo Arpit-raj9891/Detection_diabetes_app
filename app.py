@@ -88,16 +88,18 @@ class DiabetesDetectionApp:
     def load_models(self):
         """Load trained models if available."""
         try:
-            # Try to load models from simple training
+            # Try to load models from simple training (3 models only)
             if (os.path.exists('models/logistic_regression_model.pkl') and 
+                os.path.exists('models/random_forest_model.pkl') and
+                os.path.exists('models/svm_model.pkl') and
                 os.path.exists('models/scaler.pkl')):
                 self.predictor = DiabetesPredictor('models/logistic_regression_model.pkl')
-                st.success("✅ Models loaded successfully!")
+                st.success("✅ All 3 models loaded successfully!")
             elif os.path.exists('models/best_model.pkl'):
                 self.predictor = DiabetesPredictor('models/best_model.pkl')
                 st.success("✅ Model loaded successfully!")
             else:
-                st.warning("⚠️ No trained model found. Please train a model first.")
+                st.warning("⚠️ No trained models found. Please run: python simple_train.py")
         except Exception as e:
             st.error(f"❌ Error loading model: {e}")
     
@@ -105,9 +107,9 @@ class DiabetesDetectionApp:
         """Main page with diabetes detection interface."""
         st.markdown('<h1 class="main-header">🩺 Diabetes Detection using Machine Learning</h1>', unsafe_allow_html=True)
         
-        # Create tabs for different functionalities
-        tab1, tab2, tab3, tab4, tab5 = st.tabs([
-            "🏠 Home", "🔍 Prediction", "📊 Analysis", "🤖 Model Training", "📈 Evaluation"
+        # Create tabs for different functionalities (3 tabs only)
+        tab1, tab2, tab3 = st.tabs([
+            "🏠 Home", "🔍 Prediction", "📊 Analysis"
         ])
         
         with tab1:
@@ -118,12 +120,6 @@ class DiabetesDetectionApp:
         
         with tab3:
             self.analysis_tab()
-        
-        with tab4:
-            self.training_tab()
-        
-        with tab5:
-            self.evaluation_tab()
     
     def home_tab(self):
         """Home tab with project overview."""
@@ -157,7 +153,7 @@ class DiabetesDetectionApp:
             ### Model Performance
             
             Our models achieve high accuracy in diabetes prediction using:
-            - Multiple ML algorithms (Random Forest, SVM, XGBoost, etc.)
+            - Three core ML algorithms (Logistic Regression, Random Forest, SVM)
             - Advanced feature engineering
             - Comprehensive validation
             - Real-time predictions
@@ -181,7 +177,7 @@ class DiabetesDetectionApp:
             
             📈 Interactive visualizations
             
-            🤖 Multiple ML models
+            🤖 Three ML models
             
             📋 Detailed reports
             
@@ -194,7 +190,7 @@ class DiabetesDetectionApp:
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            st.metric("Models Available", "7+", "ML Algorithms")
+            st.metric("Models Available", "3", "ML Algorithms")
         
         with col2:
             st.metric("Features Analyzed", "8", "Health Parameters")
@@ -463,142 +459,7 @@ class DiabetesDetectionApp:
             )
             st.plotly_chart(fig2, use_container_width=True)
     
-    def training_tab(self):
-        """Training tab for model training."""
-        st.markdown('<h2 class="sub-header">🤖 Model Training</h2>', unsafe_allow_html=True)
-        
-        st.markdown("""
-        ### Train Your Own Diabetes Detection Model
-        
-        This section allows you to train machine learning models on diabetes data.
-        """)
-        
-        # Training options
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("#### 📊 Data Preprocessing")
-            if st.button("🔄 Run Data Preprocessing"):
-                with st.spinner("Preprocessing data..."):
-                    try:
-                        self.preprocessor = DataPreprocessor()
-                        self.preprocessor.load_data()
-                        self.preprocessor.explore_data()
-                        self.preprocessor.handle_missing_values()
-                        self.preprocessor.feature_engineering()
-                        self.preprocessor.feature_selection(k=8)
-                        self.preprocessor.scale_features()
-                        self.preprocessor.split_data()
-                        self.preprocessor.save_processed_data()
-                        st.success("✅ Data preprocessing completed!")
-                    except Exception as e:
-                        st.error(f"❌ Error in preprocessing: {e}")
-        
-        with col2:
-            st.markdown("#### 🎯 Model Training")
-            if st.button("🚀 Train Models"):
-                with st.spinner("Training models..."):
-                    try:
-                        self.trainer = DiabetesModelTrainer()
-                        self.trainer.load_data()
-                        self.trainer.initialize_models()
-                        self.trainer.train_models()
-                        self.trainer.tune_all_models()
-                        self.trainer.train_models()  # Retrain with tuned parameters
-                        self.trainer.save_models()
-                        st.success("✅ Model training completed!")
-                        
-                        # Reload predictor with new model
-                        self.load_models()
-                    except Exception as e:
-                        st.error(f"❌ Error in training: {e}")
-        
-        # Training progress and results
-        if st.button("📈 Show Training Results"):
-            if os.path.exists('models/best_model.pkl'):
-                st.success("✅ Models are available!")
-                
-                # Load and display results
-                try:
-                    evaluator = ModelEvaluator('models/best_model.pkl', 'data/processed_data.pkl')
-                    evaluator.load_test_data('data/processed_data.pkl')
-                    
-                    metrics = evaluator.calculate_metrics()
-                    if metrics:
-                        col1, col2, col3, col4 = st.columns(4)
-                        with col1:
-                            st.metric("Accuracy", f"{metrics['accuracy']:.3f}")
-                        with col2:
-                            st.metric("Precision", f"{metrics['precision']:.3f}")
-                        with col3:
-                            st.metric("Recall", f"{metrics['recall']:.3f}")
-                        with col4:
-                            st.metric("F1-Score", f"{metrics['f1_score']:.3f}")
-                except Exception as e:
-                    st.error(f"❌ Error loading results: {e}")
-            else:
-                st.warning("⚠️ No trained models found. Please train models first.")
-    
-    def evaluation_tab(self):
-        """Evaluation tab for model evaluation."""
-        st.markdown('<h2 class="sub-header">📈 Model Evaluation</h2>', unsafe_allow_html=True)
-        
-        if not os.path.exists('models/best_model.pkl'):
-            st.error("❌ No trained model available for evaluation.")
-            return
-        
-        try:
-            evaluator = ModelEvaluator('models/best_model.pkl', 'data/processed_data.pkl')
-            evaluator.load_test_data('data/processed_data.pkl')
-            
-            # Evaluation metrics
-            metrics = evaluator.calculate_metrics()
-            if metrics:
-                st.markdown("### 📊 Model Performance Metrics")
-                
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    st.metric("Accuracy", f"{metrics['accuracy']:.3f}")
-                with col2:
-                    st.metric("Precision", f"{metrics['precision']:.3f}")
-                with col3:
-                    st.metric("Recall", f"{metrics['recall']:.3f}")
-                with col4:
-                    st.metric("F1-Score", f"{metrics['f1_score']:.3f}")
-                
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                    st.metric("ROC-AUC", f"{metrics['roc_auc']:.3f}")
-                with col2:
-                    st.metric("Average Precision", f"{metrics['average_precision']:.3f}")
-                with col3:
-                    st.metric("Log Loss", f"{metrics['log_loss']:.3f}")
-                
-                # Generate evaluation plots
-                if st.button("📊 Generate Evaluation Plots"):
-                    with st.spinner("Generating plots..."):
-                        evaluator.plot_confusion_matrix()
-                        evaluator.plot_roc_curve()
-                        evaluator.plot_precision_recall_curve()
-                        evaluator.plot_feature_importance()
-                        st.success("✅ Evaluation plots generated!")
-                
-                # Generate detailed report
-                if st.button("📋 Generate Detailed Report"):
-                    with st.spinner("Generating report..."):
-                        evaluator.generate_detailed_report()
-                        st.success("✅ Detailed report generated!")
-                
-                # Error analysis
-                if st.button("🔍 Analyze Prediction Errors"):
-                    with st.spinner("Analyzing errors..."):
-                        error_df = evaluator.analyze_prediction_errors()
-                        if error_df is not None:
-                            st.dataframe(error_df.head())
-                            st.success("✅ Error analysis completed!")
-        
-        except Exception as e:
-            st.error(f"❌ Error in evaluation: {e}")
+    # Training and Evaluation tabs removed as requested by user
 
 def main():
     """Main function to run the Streamlit app."""
