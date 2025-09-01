@@ -96,6 +96,8 @@ Feel free to contribute to this project by:
 - Enhancing data preprocessing
 - Adding new evaluation metrics
 
+##Project deployed at: https://detectiondiabetesapp-5ehhcaa3mztpmqdj6r8uzx.streamlit.app/
+
 ## License
 
 This project is open source and available under the MIT License.
