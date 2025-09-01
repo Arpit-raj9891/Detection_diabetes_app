@@ -12,10 +12,12 @@ from pathlib import Path
 # Add src directory to path
 sys.path.append(str(Path(__file__).parent / "src"))
 
-from utils import DiabetesPredictor, DataValidator, create_sample_data
-from data_preprocessing import DataPreprocessor
-from model_training import DiabetesModelTrainer
-from model_evaluation import ModelEvaluator
+# Only import what we need
+try:
+    from utils import DiabetesPredictor, DataValidator, create_sample_data
+except ImportError:
+    st.error("❌ Could not import utils module. Please ensure all files are present.")
+    st.stop()
 
 # Page configuration
 st.set_page_config(
@@ -80,9 +82,6 @@ st.markdown("""
 class DiabetesDetectionApp:
     def __init__(self):
         self.predictor = None
-        self.preprocessor = None
-        self.trainer = None
-        self.evaluator = None
         self.load_models()
     
     def load_models(self):
